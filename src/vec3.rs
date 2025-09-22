@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 pub type Point3 = Vec3;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -50,6 +50,13 @@ impl Mul<Vec3> for f64 {
     type Output = Vec3;
     fn mul(self, other: Vec3) -> Vec3 {
         Vec3::new(self * other.x, self * other.y, self * other.z)
+    }
+}
+
+impl Neg for Vec3 {
+    type Output = Vec3;
+    fn neg(self) -> Vec3 {
+        Vec3::new(-self.x, -self.y, -self.z)
     }
 }
 

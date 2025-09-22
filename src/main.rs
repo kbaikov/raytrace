@@ -1,5 +1,7 @@
 mod color;
 mod hittable;
+mod hittable_list;
+mod interval;
 mod ray;
 mod sphere;
 mod vec3;
@@ -9,6 +11,12 @@ use ray::Ray;
 
 use vec3::{Point3, Vec3};
 
+use hittable::Hittable;
+use hittable_list::HittableList;
+use sphere::Sphere;
+
+use crate::interval::Interval;
+
 fn main() {
     // Image
     let aspect_ratio = 16.0 / 9.0;
@@ -17,6 +25,11 @@ fn main() {
     // Calculate the image height and ensure it is at least 1.
     let mut image_height = (image_width as f64 / aspect_ratio) as u64;
     image_height = if image_height < 1 { 1 } else { image_height };
+
+    // World
+    let mut world = HittableList::new();
+    world.add(Sphere::new(Point3::new(0., 0., -1.), 0.5));
+    world.add(Sphere::new(Point3::new(0., -100.5, -1.), 100.));
 
     // Camera
     let focal_length = 1.0;
@@ -50,7 +63,7 @@ fn main() {
             let ray_direction = pixel_center - camera_center;
             let r = Ray::new(camera_center, ray_direction);
 
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r, &world);
 
             write_color(&mut out, pixel_color);
         }
@@ -58,25 +71,9 @@ fn main() {
     eprint!("\rDone                         \n")
 }
 
-fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> f64 {
-    let oc = center - r.origin;
-    let a = r.direction.lengh_squared();
-    let h = Vec3::dot(r.direction, oc);
-    let c = oc.lengh_squared() - radius * radius;
-    let discriminant = h * h - a * c;
-
-    if discriminant < 0. {
-        return -1.0;
-    } else {
-        return (h - discriminant.sqrt()) / a;
-    }
-}
-
-fn ray_color(r: &Ray) -> Color {
-    let t = hit_sphere(Point3::new(0., 0., -1.), 0.5, r);
-    if t > 0.0 {
-        let n = Vec3::unit_vector(r.at(t) - Vec3::new(0., 0., -1.));
-        return 0.5 * Color::new(n.x, n.y + 1., n.z + 1.);
+fn ray_color(r: &Ray, world: &impl Hittable) -> Color {
+    if let Some(rec) = world.hit(r, Interval::new(0.0, f64::INFINITY)) {
+        return 0.5 * (Color::from(rec.normal) + Color::new(1.0, 1.0, 1.0));
     }
 
     let unit_direction = Vec3::unit_vector(r.direction);

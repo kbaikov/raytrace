@@ -3,6 +3,8 @@ use std::{
     ops::{Add, Mul},
 };
 
+use crate::vec3::Vec3;
+
 pub struct Color {
     r: f64,
     g: f64,
@@ -12,6 +14,12 @@ pub struct Color {
 impl Color {
     pub fn new(r: f64, g: f64, b: f64) -> Color {
         Color { r, g, b }
+    }
+}
+
+impl From<Vec3> for Color {
+    fn from(v: Vec3) -> Color {
+        Color::new(v.x, v.y, v.z)
     }
 }
 
