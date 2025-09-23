@@ -1,9 +1,9 @@
 use std::{
     io::Write,
-    ops::{Add, Mul},
+    ops::{Add, AddAssign, Mul},
 };
 
-use crate::vec3::Vec3;
+use crate::{interval::Interval, vec3::Vec3};
 
 pub struct Color {
     r: f64,
@@ -14,6 +14,14 @@ pub struct Color {
 impl Color {
     pub fn new(r: f64, g: f64, b: f64) -> Color {
         Color { r, g, b }
+    }
+}
+
+impl AddAssign for Color {
+    fn add_assign(&mut self, rhs: Self) {
+        self.r += rhs.r;
+        self.g += rhs.g;
+        self.b += rhs.b;
     }
 }
 
@@ -38,9 +46,10 @@ impl Add for Color {
 }
 
 pub fn write_color(out: &mut impl Write, pixel_color: Color) {
-    let rbyte = (255.999 * pixel_color.r) as usize;
-    let gbyte = (255.999 * pixel_color.g) as usize;
-    let bbyte = (255.999 * pixel_color.b) as usize;
+    let intensity = Interval::new(0.0, 0.999);
+    let rbyte = (256.0 * intensity.clamp(pixel_color.r)) as usize;
+    let gbyte = (256.0 * intensity.clamp(pixel_color.g)) as usize;
+    let bbyte = (256.0 * intensity.clamp(pixel_color.b)) as usize;
 
     writeln!(out, "{rbyte} {gbyte} {bbyte}").unwrap();
 }

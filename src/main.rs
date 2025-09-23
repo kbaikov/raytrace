@@ -5,6 +5,7 @@ mod hittable_list;
 mod interval;
 mod ray;
 mod sphere;
+mod util;
 mod vec3;
 
 use vec3::Point3;
@@ -22,5 +23,6 @@ fn main() {
     let mut cam = Camera::new();
     cam.aspect_ratio = 16.0 / 9.0;
     cam.image_width = 400;
+    cam.samples_per_pixel = 100;
     cam.render(&world);
 }
