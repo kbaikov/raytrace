@@ -2,7 +2,7 @@ use crate::{
     color::{Color, write_color},
     hittable::Hittable,
     interval::Interval,
-    ray::{self, Ray},
+    ray::Ray,
     util::random_f64,
     vec3::{Point3, Vec3},
 };
@@ -94,8 +94,11 @@ impl Camera {
             return Color::new(0.0, 0., 0.);
         }
         if let Some(rec) = world.hit(r, Interval::new(0.001, f64::INFINITY)) {
-            let direction = rec.normal + Vec3::random_unit_vector();
-            return 0.5 * self.ray_color(&Ray::new(rec.p, direction), depth - 1, world);
+            if let Some((attentuation, scattered)) = rec.mat.scatter(r, &rec) {
+                return attentuation * self.ray_color(&scattered, depth - 1, world);
+            } else {
+                return Color::new(0.0, 0.0, 0.0);
+            }
         }
 
         let unit_direction = Vec3::unit_vector(r.direction);

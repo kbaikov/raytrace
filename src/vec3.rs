@@ -28,6 +28,14 @@ impl Vec3 {
     pub fn unit_vector(v: Vec3) -> Vec3 {
         v / v.lengh()
     }
+
+    pub fn near_zero(&self) -> bool {
+        const S: f64 = 1e-8;
+        self.x.abs() < S && self.y.abs() < S && self.z.abs() < S
+    }
+    pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+        v - 2. * Vec3::dot(v, n) * n
+    }
     pub fn random_unit_vector() -> Vec3 {
         loop {
             let p = Vec3::random_range(-1.0, 1.);

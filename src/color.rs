@@ -5,6 +5,7 @@ use std::{
 
 use crate::{interval::Interval, vec3::Vec3};
 
+#[derive(Clone)]
 pub struct Color {
     r: f64,
     g: f64,
@@ -35,6 +36,13 @@ impl Mul<Color> for f64 {
     type Output = Color;
     fn mul(self, other: Color) -> Color {
         Color::new(self * other.r, self * other.g, self * other.b)
+    }
+}
+
+impl Mul<Color> for Color {
+    type Output = Color;
+    fn mul(self, other: Color) -> Color {
+        Color::new(self.r * other.r, self.g * other.g, self.b * other.b)
     }
 }
 
