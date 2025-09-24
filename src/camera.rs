@@ -2,7 +2,7 @@ use crate::{
     color::{Color, write_color},
     hittable::Hittable,
     interval::Interval,
-    ray::Ray,
+    ray::{self, Ray},
     util::random_f64,
     vec3::{Point3, Vec3},
 };
@@ -11,6 +11,7 @@ pub struct Camera {
     pub aspect_ratio: f64,
     pub image_width: u64,
     pub samples_per_pixel: usize,
+    pub max_depth: usize, // Maximum number of ray bounces into scene
 
     image_height: u64,
     pixel_samples_scale: f64,
@@ -26,6 +27,7 @@ impl Camera {
             aspect_ratio: 1.0,
             image_width: 100,
             samples_per_pixel: 10,
+            max_depth: 10,
             image_height: 0,
             pixel_samples_scale: 0.0,
             center: Point3::zero(),
@@ -47,7 +49,7 @@ impl Camera {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                 for sample in 0..self.samples_per_pixel {
                     let r = self.get_ray(i, j);
-                    pixel_color += self.ray_color(&r, world);
+                    pixel_color += self.ray_color(&r, self.max_depth, world);
                 }
 
                 write_color(&mut out, self.pixel_samples_scale * pixel_color);
@@ -87,9 +89,13 @@ impl Camera {
         self.pixel100_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
     }
 
-    pub fn ray_color(&self, r: &Ray, world: &impl Hittable) -> Color {
-        if let Some(rec) = world.hit(r, Interval::new(0.0, f64::INFINITY)) {
-            return 0.5 * (Color::from(rec.normal) + Color::new(1.0, 1.0, 1.0));
+    pub fn ray_color(&self, r: &Ray, depth: usize, world: &impl Hittable) -> Color {
+        if depth <= 0 {
+            return Color::new(0.0, 0., 0.);
+        }
+        if let Some(rec) = world.hit(r, Interval::new(0.001, f64::INFINITY)) {
+            let direction = rec.normal + Vec3::random_unit_vector();
+            return 0.5 * self.ray_color(&Ray::new(rec.p, direction), depth - 1, world);
         }
 
         let unit_direction = Vec3::unit_vector(r.direction);

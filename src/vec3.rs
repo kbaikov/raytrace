@@ -1,4 +1,6 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
+
+use crate::util::{random_f64, random_f64_range};
 pub type Point3 = Vec3;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -26,9 +28,36 @@ impl Vec3 {
     pub fn unit_vector(v: Vec3) -> Vec3 {
         v / v.lengh()
     }
+    pub fn random_unit_vector() -> Vec3 {
+        loop {
+            let p = Vec3::random_range(-1.0, 1.);
+            let lensq = p.lengh_squared();
+            if 1e-160 < lensq && lensq <= 1. {
+                return p / lensq.sqrt();
+            }
+        }
+    }
+    pub fn random_on_hemisphere(normal: Vec3) -> Vec3 {
+        let on_unit_sphere = Vec3::random_unit_vector();
+        if Vec3::dot(on_unit_sphere, normal) > 0.0 {
+            return on_unit_sphere;
+        } else {
+            return -on_unit_sphere;
+        }
+    }
 
     pub fn dot(u: Vec3, v: Vec3) -> f64 {
         u.x * v.x + u.y * v.y + u.z * v.z
+    }
+    pub fn random() -> Vec3 {
+        Vec3::new(random_f64(), random_f64(), random_f64())
+    }
+    pub fn random_range(min: f64, max: f64) -> Vec3 {
+        Vec3::new(
+            random_f64_range(min, max),
+            random_f64_range(min, max),
+            random_f64_range(min, max),
+        )
     }
 }
 
