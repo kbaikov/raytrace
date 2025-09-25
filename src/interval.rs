@@ -7,10 +7,10 @@ impl Interval {
     pub fn new(min: f64, max: f64) -> Interval {
         Interval { min, max }
     }
-    pub fn size(&self) -> f64 {
+    pub fn _size(&self) -> f64 {
         self.max - self.min
     }
-    pub fn contains(&self, x: f64) -> bool {
+    pub fn _contains(&self, x: f64) -> bool {
         self.min <= x && self.max >= x
     }
     pub fn surrounds(&self, x: f64) -> bool {

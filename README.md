@@ -1,9 +1,7 @@
 # Ray Tracing In One Weekend
 
-Implements [Ray Tracing In One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) in Rust.
+Implements [_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html) in Rust.
 
-The Result:
+A Final Render:
 
-![Result](image.ppm)
-
-<img style="display: block; margin: auto;" src="image.ppm"/>
+![Result](image.png)
