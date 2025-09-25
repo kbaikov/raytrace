@@ -3,7 +3,7 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 use crate::util::{random_f64, random_f64_range};
 pub type Point3 = Vec3;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -17,16 +17,23 @@ impl Vec3 {
     pub fn zero() -> Vec3 {
         Vec3::new(0.0, 0.0, 0.0)
     }
-    pub fn lengh(&self) -> f64 {
-        self.lengh_squared().sqrt()
+    pub fn length(&self) -> f64 {
+        self.length_squared().sqrt()
     }
 
-    pub fn lengh_squared(&self) -> f64 {
+    pub fn length_squared(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     pub fn unit_vector(v: Vec3) -> Vec3 {
-        v / v.lengh()
+        v / v.length()
+    }
+    pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
+        Vec3::new(
+            u.y * v.z - u.z * v.y,
+            u.z * v.x - u.x * v.z,
+            u.x * v.y - u.y * v.x,
+        )
     }
 
     pub fn near_zero(&self) -> bool {
@@ -39,13 +46,13 @@ impl Vec3 {
     pub fn refract(uv: Vec3, n: Vec3, etai_over_etat: f64) -> Vec3 {
         let cos_theta = Vec3::dot(-uv, n).min(1.0);
         let r_out_perp = etai_over_etat * (uv + cos_theta * n);
-        let r_out_parallel = -(1.0 - r_out_perp.lengh_squared()).abs().sqrt() * n;
+        let r_out_parallel = -(1.0 - r_out_perp.length_squared()).abs().sqrt() * n;
         r_out_perp + r_out_parallel
     }
     pub fn random_unit_vector() -> Vec3 {
         loop {
             let p = Vec3::random_range(-1.0, 1.);
-            let lensq = p.lengh_squared();
+            let lensq = p.length_squared();
             if 1e-160 < lensq && lensq <= 1. {
                 return p / lensq.sqrt();
             }

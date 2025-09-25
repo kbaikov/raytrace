@@ -23,11 +23,11 @@ impl<'a> Sphere<'a> {
 }
 
 impl<'a> Hittable for Sphere<'a> {
-    fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord<'_>> {
         let oc = self.center - r.origin;
-        let a = r.direction.lengh_squared();
+        let a = r.direction.length_squared();
         let h = Vec3::dot(r.direction, oc);
-        let c = oc.lengh_squared() - self.radius * self.radius;
+        let c = oc.length_squared() - self.radius * self.radius;
         let discriminant = h * h - a * c;
 
         if discriminant < 0. {
